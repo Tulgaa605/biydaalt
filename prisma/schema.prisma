@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+model Post {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  companyId String
+  company   TravelCompany @relation(fields: [companyId], references: [id], onDelete: Cascade)
+  imageUrl  String?
+  userId    String @db.ObjectId  
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model User {
+  id       String   @id @default(auto()) @map("_id") @db.ObjectId
+  username String
+  email    String  @unique(map: "email")
+  trips    Trip[]
+  posts    Post[]   
+  reviews  Review[]
+}
+
+model Destination {
+  id       String   @id @map("_id")
+  name     String
+  country  String
+  trips    Trip[]
+}
+
+model Trip {
+  id            String   @id @map("_id")
+  title         String
+  startDate     DateTime
+  endDate       DateTime
+  userId        String @db.ObjectId
+  destinationId String
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  destination   Destination @relation(fields: [destinationId], references: [id], onDelete: Cascade)
+  bookings      Booking[]  // Харгалзах талбар
+  reviews       Review[]   // Харгалзах талбар
+}
+
+model Booking {
+  id       String   @id @map("_id")
+  tripId   String
+  hotel    String
+  price    Float
+  trip     Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+}
+
+model Review {
+  id       String   @id @map("_id")
+  userId   String @db.ObjectId
+  tripId   String
+  rating   Int
+  comment  String
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  trip     Trip     @relation(fields: [tripId], references: [id], onDelete: Cascade)
+}
+
+model TravelCompany {
+  id       String   @id @map("_id")
+  name     String
+  country  String
+  website  String
+  posts    Post[]
+  logoUrl  String?
+}
