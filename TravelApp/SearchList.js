@@ -4,7 +4,7 @@ import Cards from "./cards";
 import DestinationCard from "./DestinationCard";
 import CategoryList from "./CategoryList";
 import { BoxShadow } from 'react-native-shadow';
-import MoveAnimationExample from "../MoveAnimationExample";
+
 const DATA = [
     { 
       id: 1, 
@@ -211,7 +211,7 @@ const SearchList = () => {
       <DestinationCard/>
       <CategoryList/>
       <Cards data={filteredData} />
-      <MoveAnimationExample/>
+
     </View>
   );
 };

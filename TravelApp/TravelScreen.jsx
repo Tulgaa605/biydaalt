@@ -3,14 +3,19 @@ import { View, StyleSheet, Image, Text, ScrollView } from "react-native";
 import Header from "./Header";
 import SearchList from "./SearchList";
 import Icon from "react-native-vector-icons/AntDesign";
+import Tab from "../tabnavigator/tab";
 const TravelScreen = () => {
   return (
-    <ScrollView contentContainerStyle={styles.scrollContainer}>
-      <View style={styles.container}>
-        <Header />
-        <SearchList/>
-      </View>
-    </ScrollView>
+    <View>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        <View style={styles.container}>
+          <Header />
+          <SearchList/>
+        </View>
+      </ScrollView>
+      <Tab/>
+    </View>
+  
   );
 };
 

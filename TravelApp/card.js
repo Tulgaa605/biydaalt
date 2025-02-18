@@ -1,13 +1,23 @@
-import React, { useState, useContext } from "react"; 
+import React from "react"; 
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import Icon from "react-native-vector-icons/AntDesign";
-
-const Card = ({ item, onPress }) => {
+import Animated from 'react-native-reanimated';
+import { useNavigation } from "@react-navigation/native";
+import { SharedElement } from 'react-navigation-shared-element';
+const Card = ({ item }) => {
+  const navigation = useNavigation();
 
   return (
     <View style={styles.cars}>
-      <TouchableOpacity style={styles.card} onPress={onPress}>
-        <Image source={{ uri: item.imageUrl }} style={styles.image} />
+      <TouchableOpacity 
+        style={styles.card} 
+        onPress={() => navigation.navigate("Details", { item })}
+      >
+
+        <SharedElement id={`sharedBox-${item.id}`} style={styles.imageContainer}>
+          <Image source={{ uri: item.imageUrl }} style={styles.image} />
+        </SharedElement>
+
         <View style={styles.sagsandNemeh}>
           <View style={styles.info}>
             <Text style={styles.name}>{item.name}</Text>
@@ -27,7 +37,7 @@ const styles = StyleSheet.create({
   cars: {
     flexDirection: "row",
     flexWrap: "wrap",
-    marginRight:10
+    marginRight: 10
   },
   card: {
     backgroundColor: "#fff",
@@ -40,7 +50,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 3,
     width: 170,
-    height:250
+    height: 250
   },
   image: {
     width: 160,
@@ -64,9 +74,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-around"
   },
-  price:{
-    marginLeft:20,
-    color:'gray'
+  price: {
+    marginLeft: 20,
+    color: 'gray'
   }
 });
 

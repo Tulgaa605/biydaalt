@@ -2,9 +2,11 @@ import React from "react";
 import { View, FlatList, StyleSheet, Image, Text } from "react-native";
 import Card from "./card"; 
 import { useNavigation } from "@react-navigation/native";
+import { SharedElement } from 'react-native-shared-element';
 
 const Cards = ({ data }) => {
   const navigation = useNavigation();
+
   return (
     <FlatList
       style={styles.container}
@@ -12,10 +14,12 @@ const Cards = ({ data }) => {
       horizontal
       keyExtractor={(item) => item.id.toString()}  
       renderItem={({ item }) => (
-        <Card
-          item={item}
-          onPress={() => navigation.navigate("Details", { item })}
-        />
+        <SharedElement id={`sharedBox-${item.id}`}>
+          <Card
+            item={item}
+            onPress={() => navigation.navigate("Details", { item })}
+          />
+        </SharedElement>
       )}
       showsHorizontalScrollIndicator={false}  
     />
@@ -27,7 +31,7 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginTop:40,
+    marginTop: 40,
   },
   button: {
     paddingHorizontal: 10,
