@@ -1,63 +1,97 @@
-const prisma = require('../db/index');  
+const {PrismaClient} = require("@prisma/client");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
-
+const prisma = new PrismaClient();
 
 exports.createUser = async (req, res) => {
-  
+  const { firstName, lastName, email, password, phone } = req.body;
+
   try {
-    const { username, email } = req.body;
+    const hashedPassword = await bcrypt.hash(password, 10);
+
     const user = await prisma.user.create({
-      data: { username, email },
+      data: {
+        firstName,
+        lastName,
+        email,
+        password: hashedPassword,
+        phone,
+      },
     });
-    res.status(201).json(user);
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: 'Хэрэглэгч үүсгэхэд алдаа гарлаа',error });
+
+    res.status(201).json({
+      message: "User created successfully",
+      user,
+    });
+  } catch (err) {
+    console.error("Error creating user:", err.message);
+    res.status(500).json({ error: "Error creating user!" });
   }
 };
 
-exports.getUser = async (req, res) => {
+  
+
+exports.loginUser = async (req, res) => {
+  const { email, password } = req.body;
+
   try {
     const user = await prisma.user.findUnique({
-      where: { id: req.params.id },
+      where: {
+        email,
+      },
     });
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({ error: 'Хэрэглэгч олдсонгүй' });
+
+    if (!user) {
+      console.log("Хэрэглэгчийн мэдээлэл олдсонгүй: ", email);
+      return res.status(401).json({ error: "Хэрэглэгч олдсонгүй!" });
+    }
+    
+    const isPasswordValid = await bcrypt.compare(password, user.password);
+
+    if (!isPasswordValid) {
+      console.log("Нууц үг буруу: ", email);
+      return res.status(401).json({ error: "Нууц үг буруу!" });
+    }
+    
+    const token = jwt.sign(
+      { userId: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "1h" }
+    );
+
+    res.status(200).json({
+      message: "Амжилттай нэвтэрлээ!",
+      token,
+      user, 
+    });
+  } catch (err) {
+    console.error("Логинд алдаа гарлаа:", err.message);
+    res.status(500).json({ error: "Логин хийхэд алдаа гарлаа!" });
   }
 };
 
+exports.recover = async (req, res) => {
+  const { email, name, phone, password } = req.body;
 
-exports.updateUser = async (req, res) => {
-  const { username, email } = req.body;
   try {
+    const data = { name, phone };
+
+    if (password) { 
+      data.password = await bcrypt.hash(password, 10);
+    }
+
     const user = await prisma.user.update({
-      where: { id: req.params.id },
-      data: { username, email },
+      where: { email },
+      data,
     });
-    res.status(200).json(user);
-  } catch (error) {
-    res.status(500).json({ error: 'Хэрэглэгчийг шинэчлэхэд алдаа гарлаа' });
-  }
-};
 
-
-exports.deleteUser = async (req, res) => {
-  try {
-    await prisma.user.delete({
-      where: { id: req.params.id },
+    res.status(200).json({
+      message: "Хэрэглэгчийн мэдээлэл амжилттай шинэчлэгдлээ!",
+      user,
     });
-    res.status(200).json({ message: 'Хэрэглэгч амжилттай устгагдлаа' });
-  } catch (error) {
-    res.status(500).json({ error: 'Хэрэглэгчийг устгахад алдаа гарлаа' });
-  }
-};
-exports.getAllUsers = async (req, res) => {
-  try {
-    const users = await prisma.user.findMany();  
-    res.status(200).json(users);
-  } catch (error) {
-    console.log(error);
-    res.status(500).json({ error: 'Хэрэглэгчдийг авахад алдаа гарлаа' });
+  } catch (err) {
+    console.error("Шинэчлэхэд алдаа гарлаа:", err.message);
+    res.status(500).json({ error: "Шинэчлэх явцад алдаа гарлаа!" });
   }
 };
