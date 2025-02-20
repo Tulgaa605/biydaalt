@@ -16,7 +16,7 @@ const Tab = () => {
             <TouchableOpacity style={styles.opacity} onPress={() => navigation.navigate("Blog")}>
             <View style={styles.icon}>
                 <Icon name="thumbs-o-up" size={24} color="white" />
- 
+                
             </View>
             </TouchableOpacity>
             <TouchableOpacity style={styles.opacity} onPress={() => navigation.navigate("Profile")}>

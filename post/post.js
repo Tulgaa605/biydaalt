@@ -8,7 +8,7 @@ const Post = () => {
 
   const handlePostRequest = async () => {
     try {
-      const response = await axios.post("http:// 192.168.88.230:3000/post/createPost", {
+      const response = await axios.post("http:// 192.168.88.201:3000/post/createPost", {
         title : title,
         content: content,
       });
