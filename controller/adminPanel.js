@@ -34,7 +34,8 @@ exports.registerAdmin = async (req, res) => {
     });
     res.status(201).json({ message: "Админ амжилттай үүсгэлээ", admin });
   } catch (err) {
-    res.status(500).json({ error: "Админ бүртгэхэд алдаа гарлаа" });
+    console.log(err);
+    res.status(500).json({ error: "Админ бүртгэхэд алдаа гарлаа", err});
   }
 };
 
@@ -78,7 +79,7 @@ exports.deleteAdmin = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
-    await prisma.user.delete({ where: { id: parseInt(id) } });
+    await prisma.user.delete({ where: { id: parseInt(id) }});
     res.json({ message: "Хэрэглэгч устгагдлаа" });
   } catch (err) {
     res.status(500).json({ error: "Хэрэглэгч устгахад алдаа гарлаа" });
@@ -123,7 +124,6 @@ exports.updateProduct = async (req, res) => {
   }
 };
 
-
 exports.deleteProduct = async (req, res) => {
   const { id } = req.params;
   try {
@@ -134,4 +134,50 @@ exports.deleteProduct = async (req, res) => {
   }
 };
 
+exports.modertor = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await prisma.user.update({
+      where: { id: parseInt(id) },
+      data: { role: "MODERATOR" },
+    });
+    res.json({ message: "Модератор бүртгэгдлээ" });
+  } catch (err) {
+    res.status(500).json({ error: "Модератор бүртгэхэд алдаа гарлаа" });
+  }
+}
+
+exports.modertorList = async (req, res) => {
+  try {
+    const modertors = await prisma.user.findMany({ where: { role: "MODERATOR" } });    
+    res.json(modertors);
+  } catch (err) {  
+    res.status(500).json({ error: "Модераторуудын мэдээлэл авахад алдаа гарлаа"});
+  }
+}
+
+exports.deleteModertor = async (req, res) => {
+  const { id } = req.params;
+  try {
+    await prisma.user.delete({ where: { id: parseInt(id) } });    
+    res.json({ message: "Модератор устгагдлаа" });
+  } catch (err) {    
+    res.status(500).json({ error: "Модератор устгахад алдаа гарлаа" });
+  }
+}
+
+exports.updateModertor = async (req, res) => {
+  const { id } = req.params;
+  const { email } = req.body;
+  try {
+    await prisma.user.update({
+      where: { id: parseInt(id) },
+      data: { email },
+    });    
+    res.json({ message: "Модератор шинэчлэгдлээ" });
+  } catch (err) {    
+    res.status(500).json({ error: "Модератор шинэчлэхэд алдаа гарлаа" });
+  }
+}
 exports.authenticateAdmin = authenticateAdmin;
+
